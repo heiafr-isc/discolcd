@@ -1,0 +1,17 @@
+{
+    "name": "DiscoLcd",
+    "version": "0.1.0",
+    "description": "Disco LCD library",
+    "keywords": "ADO",
+    "authors":
+    [
+      {
+        "name": "Jacques Supcik",
+        "email": "jacques.supcik@hefr.ch",
+        "maintainer": true
+      }
+    ],
+    "license": "Apache-2.0",
+    "frameworks": "libopencm3",
+    "platforms": "ststm32"
+  }
