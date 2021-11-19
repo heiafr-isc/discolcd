@@ -32,7 +32,6 @@
 #include <libopencm3/stm32/timer.h>
 
 #include <AdafruitGFX.hpp>
-#include <Systick.hpp>
 
 constexpr auto kLcdRccResetPort = RCC_GPIOD;
 constexpr auto kLcdResetPort    = GPIOD;
@@ -73,12 +72,21 @@ constexpr auto kLcdPowerCtrl        = 0xD0;
 constexpr auto kLcdPvGammaCtrl      = 0xE0;
 constexpr auto kLcdNvGammaCtrl      = 0xE1;
 
+constexpr uint32_t delayFactor = 14000;  // for system running @84Mhz
+
 struct lcd_controller {
     volatile uint16_t reg;
     volatile uint16_t ram;
 };
 
 static volatile struct lcd_controller* lcd_controller = (struct lcd_controller*)FSMC_BANK1_BASE;
+
+static void DelayMilliseconds(uint32_t ms)
+{
+    for (uint32_t i = 0; i < ms * delayFactor; i++) {
+        asm volatile("nop");
+    }
+}
 
 static void GpioSetup(void)
 {
@@ -193,13 +201,13 @@ void WriteRegister(uint8_t Command, uint8_t* Parameters = nullptr, uint8_t NbPar
 void DiscoLcdHardReset(void)
 {
     gpio_clear(kLcdResetPort, kLcdResetPin);
-    SystickDelayMilliseconds(5);  // Reset signal asserted during 5ms
+    DelayMilliseconds(5);  // Reset signal asserted during 5ms
     gpio_set(kLcdResetPort, kLcdResetPin);
-    SystickDelayMilliseconds(10);  // Reset signal released during 10ms
+    DelayMilliseconds(10);  // Reset signal released during 10ms
     gpio_clear(kLcdResetPort, kLcdResetPin);
-    SystickDelayMilliseconds(20);  // Reset signal asserted during 20ms
+    DelayMilliseconds(20);  // Reset signal asserted during 20ms
     gpio_set(kLcdResetPort, kLcdResetPin);
-    SystickDelayMilliseconds(10);  // Reset signal released during 10ms
+    DelayMilliseconds(10);  // Reset signal released during 10ms
 }
 
 void DiscoLcdDisplayOn(void)
@@ -214,7 +222,7 @@ void DiscoLcdDisplayOff(void)
     parameter[0] = 0xFE;
     WriteRegister(kLcdDisplayOff, parameter, 1);
     WriteRegister(kLcdSleepIn);
-    SystickDelayMilliseconds(10);
+    DelayMilliseconds(10);
 }
 
 void DiscoLcdSetCursor(uint16_t xPos, uint16_t yPos)
@@ -329,11 +337,11 @@ void DiscoLcdSetup(DiscoLcdOrientation orientation)
     DiscoLcdHardReset();
 
     WriteRegister(kLcdSleepIn);
-    SystickDelayMilliseconds(10);
+    DelayMilliseconds(10);
     WriteRegister(kLcdSwReset);
-    SystickDelayMilliseconds(200);
+    DelayMilliseconds(200);
     WriteRegister(kLcdSleepOut);
-    SystickDelayMilliseconds(120);
+    DelayMilliseconds(120);
 
     parameter[0] = 0x00;
     WriteRegister(kLcdNormalDisplay, parameter, 1);
