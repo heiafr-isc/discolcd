@@ -265,6 +265,15 @@ void DiscoLcdSetPixel(uint16_t xPos, uint16_t yPos, uint16_t rgbCode)
     LcdFsmcWriteData(rgbCode);
 }
 
+void DiscoLcdSetHLine(uint16_t xPos, uint16_t yPos, uint16_t len, uint16_t* buffer)
+{
+    DiscoLcdSetCursor(xPos, yPos);
+    WriteRegister(kLcdWriteRam);  // Prepare to write to LCD RAM
+    for (int i = 0; i < len; i++) {
+        LcdFsmcWriteData(buffer[i]);
+    }
+}
+
 void DiscoLcdDrawHLine(uint16_t xPos, uint16_t yPos, uint16_t len, uint16_t rgbCode)
 {
     DiscoLcdSetCursor(xPos, yPos);
@@ -468,8 +477,76 @@ void DiscoLcdSetup(DiscoLcdOrientation orientation)
 
 uint16_t DiscoLcdId(void) { return ReadRegister(kLcdId); }
 
-void DiscoLcdGFX::drawPixel(int16_t x, int16_t y, uint16_t color) { DiscoLcdSetPixel(x, y, color); }
+void DiscoLcdGFX::drawPixel(int16_t x, int16_t y, uint16_t color)
+{
+    canvas_[x][y] = color;
+    DiscoLcdSetPixel(x, y, color);
+}
 void DiscoLcdGFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
+    for (int16_t i = x; i < x + w; i++) {
+        canvas_[y][i] = color;
+    }
     DiscoLcdDrawHLine(x, y, w, color);
+}
+
+void DiscoLcdGFX::startWrite(void)
+{
+    // for (int y = 0; y < kLcdScreenHeight; y++) {
+    //     DiscoLcdGetHLine(0, y, kLcdScreenWidth, canvas_[y]);
+    // }
+    minx_ = kLcdScreenWidth;
+    maxx_ = 0;
+    miny_ = kLcdScreenHeight;
+    maxy_ = 0;
+}
+
+void DiscoLcdGFX::fixBoundingBox(int16_t x, int16_t y)
+{
+    if (x < minx_) minx_ = x;
+    if (x > maxx_) maxx_ = x;
+    if (y < miny_) miny_ = y;
+    if (y > maxy_) maxy_ = y;
+}
+
+void DiscoLcdGFX::writePixel(int16_t x, int16_t y, uint16_t color)
+{
+    fixBoundingBox(x, y);
+    canvas_[y][x] = color;
+}
+
+void DiscoLcdGFX::writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+    fixBoundingBox(x, y);
+    fixBoundingBox(x + w - 1, y + h - 1);
+    for (int16_t i = y; i < y + h; i++) {
+        for (int16_t j = x; j < x + w; j++) {
+            canvas_[i][j] = color;
+        }
+    }
+}
+
+void DiscoLcdGFX::writeFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+{
+    fixBoundingBox(x, y);
+    fixBoundingBox(x, y + h - 1);
+    for (int16_t i = y; i < y + h; i++) {
+        canvas_[i][x] = color;
+    }
+}
+
+void DiscoLcdGFX::writeFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+{
+    fixBoundingBox(x, y);
+    fixBoundingBox(x + w - 1, y);
+    for (int16_t i = x; i < x + w; i++) {
+        canvas_[y][i] = color;
+    }
+}
+
+void DiscoLcdGFX::endWrite(void)
+{
+    for (int16_t y = miny_; y <= maxy_; y++) {
+        DiscoLcdSetHLine(minx_, y, maxx_ - minx_ + 1, &canvas_[y][minx_]);
+    }
 }

@@ -52,6 +52,8 @@ void DiscoLcdWriteData(uint16_t* data, uint16_t len);
 void DiscoLcdWriteSameColor(uint16_t rgbCode, uint16_t len);
 
 void DiscoLcdSetPixel(uint16_t xPos, uint16_t yPos, uint16_t rgbCode);
+void DiscoLcdSetHLine(uint16_t xPos, uint16_t yPos, uint16_t len, uint16_t* buffer);
+
 uint16_t DiscoLcdGetPixel(uint16_t xPos, uint16_t yPos);
 void DiscoLcdGetHLine(uint16_t xPos, uint16_t yPos, uint16_t len, uint16_t* buffer);
 
@@ -61,12 +63,27 @@ void DiscoLcdDrawHLine(uint16_t xPos, uint16_t yPos, uint16_t len, uint16_t rgbC
 
 class DiscoLcdGFX : public AdafruitGFX {
    public:
-    DiscoLcdGFX(int16_t w, int16_t h) : AdafruitGFX(w, h){};
+    DiscoLcdGFX(int16_t w, int16_t h) : AdafruitGFX(w, h){
+        for (int y = 0; y < kLcdScreenHeight; y++) {
+            for (int x = 0; x < kLcdScreenWidth; x++) {
+                canvas_[y][x] = 0;
+            }
+        }
+    };
     void drawPixel(int16_t x, int16_t y, uint16_t color);
     void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+    
+    void startWrite(void);
+    void fixBoundingBox(int16_t x, int16_t y);
+    void writePixel(int16_t x, int16_t y, uint16_t color);
+    void writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+    void writeFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+    void writeFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+    void endWrite(void);
 
    private:
     uint16_t canvas_[kLcdScreenHeight][kLcdScreenWidth];
+    uint16_t minx_, miny_, maxx_, maxy_;
 };
 
 #endif /* DISCOLCD_HPP_ */
