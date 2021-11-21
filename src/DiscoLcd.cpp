@@ -32,6 +32,7 @@
 #include <libopencm3/stm32/timer.h>
 
 #include <AdafruitGFX.hpp>
+#include <cstring>
 
 constexpr auto kLcdRccResetPort = RCC_GPIOD;
 constexpr auto kLcdResetPort    = GPIOD;
@@ -473,6 +474,32 @@ void DiscoLcdSetup(DiscoLcdOrientation orientation)
     // Tearing Effect Line On: Option (00h:VSYNC Interface OFF, 01h:VSYNC Interface ON)
     parameter[0] = 0x00;
     WriteRegister(kLcdTearingEffect, parameter, 1);
+}
+
+void DiscoLcdGFX::fixCanvasBoundingBox(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
+{
+    fixBoundingBox(x0, y0);
+    fixBoundingBox(x1, y1);
+}
+
+void DiscoLcdGFX::clearCanvas(void)
+{
+    for (int y = 0; y < kLcdScreenHeight; y++) {
+        for (int x = 0; x < kLcdScreenWidth; x++) {
+            canvas_[y][x] = 0;
+        }
+    }
+}
+
+void DiscoLcdGFX::saveCanvas(void) { memcpy(savedCanvas_, canvas_, sizeof(canvas_)); }
+
+void DiscoLcdGFX::restoreCanvas(void) { memcpy(canvas_, savedCanvas_, sizeof(canvas_)); }
+
+void DiscoLcdGFX::syncCanvas(void)
+{
+    for (int y = 0; y < kLcdScreenHeight; y++) {
+        DiscoLcdGetHLine(0, y, kLcdScreenWidth, canvas_[y]);
+    }
 }
 
 uint16_t DiscoLcdId(void) { return ReadRegister(kLcdId); }
