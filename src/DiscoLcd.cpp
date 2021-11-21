@@ -288,6 +288,22 @@ uint16_t DiscoLcdGetPixel(uint16_t xPos, uint16_t yPos)
     return (red & 0xF8) << 8 | (green & 0xFC) << 3 | (blue & 0xF8) >> 3;
 }
 
+void DiscoLcdGetHLine(uint16_t xPos, uint16_t yPos, uint16_t len, uint16_t* buffer)
+{
+    DiscoLcdSetCursor(xPos, yPos);
+    WriteRegister(kLcdReadRam);  // RAM read data command
+
+    FsmcReadData();  // Read dummy data
+    for (int i = 0; i < len; i++) {
+        uint16_t part0 = FsmcReadData();
+        uint16_t part1 = FsmcReadData();
+        uint16_t red   = (part0 & 0xFC00) >> 8;
+        uint16_t green = (part0 & 0x00FC) >> 0;
+        uint16_t blue  = (part1 & 0xFC00) >> 8;
+        buffer[i]      = (red & 0xF8) << 8 | (green & 0xFC) << 3 | (blue & 0xF8) >> 3;
+    }
+}
+
 void LcdSetOrientation(DiscoLcdOrientation orientation)
 {
     uint8_t parameter[6];
@@ -453,7 +469,7 @@ void DiscoLcdSetup(DiscoLcdOrientation orientation)
 uint16_t DiscoLcdId(void) { return ReadRegister(kLcdId); }
 
 void DiscoLcdGFX::drawPixel(int16_t x, int16_t y, uint16_t color) { DiscoLcdSetPixel(x, y, color); }
-void DiscoLcdGFX::writeFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+void DiscoLcdGFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
     DiscoLcdDrawHLine(x, y, w, color);
 }
