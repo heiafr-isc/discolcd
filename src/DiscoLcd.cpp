@@ -217,7 +217,7 @@ void DiscoLcdDisplayOn(void)
     WriteRegister(kLcdSleepOut);
 }
 
-void DiscoLcdDisplayOff(void)
+void DiscoLcdDisplayOff(void)  // cppcheck-suppress unusedFunction
 {
     uint8_t parameter[1];
     parameter[0] = 0xFE;
@@ -243,7 +243,7 @@ void DiscoLcdSetCursor(uint16_t xPos, uint16_t yPos)
     WriteRegister(kLcdRaSet, parameter, 4);
 }
 
-void DiscoLcdWriteData(uint16_t* data, uint16_t len)
+void DiscoLcdWriteData(uint16_t* data, uint16_t len)  // cppcheck-suppress unusedFunction
 {
     WriteRegister(kLcdWriteRam);  // Prepare to write to LCD RAM
     for (int i = 0; i < len; i++) {
@@ -251,7 +251,7 @@ void DiscoLcdWriteData(uint16_t* data, uint16_t len)
     }
 }
 
-void DiscoLcdWriteSameColor(uint16_t rgbCode, uint16_t len)
+void DiscoLcdWriteSameColor(uint16_t rgbCode, uint16_t len)  // cppcheck-suppress unusedFunction
 {
     WriteRegister(kLcdWriteRam);  // Prepare to write to LCD RAM
     for (int i = 0; i < len; i++) {
@@ -284,7 +284,7 @@ void DiscoLcdDrawHLine(uint16_t xPos, uint16_t yPos, uint16_t len, uint16_t rgbC
     }
 }
 
-uint16_t DiscoLcdGetPixel(uint16_t xPos, uint16_t yPos)
+uint16_t DiscoLcdGetPixel(uint16_t xPos, uint16_t yPos)  // cppcheck-suppress unusedFunction
 {
     DiscoLcdSetCursor(xPos, yPos);
     WriteRegister(kLcdReadRam);  // RAM read data command
@@ -355,7 +355,7 @@ void DiscoLcdClear(uint16_t rgbCode)
     }
 }
 
-void DiscoLcdSetup(DiscoLcdOrientation orientation)
+void DiscoLcdSetup(DiscoLcdOrientation orientation)  // cppcheck-suppress unusedFunction
 {
     uint8_t parameter[14];
     GpioSetup();
@@ -476,7 +476,10 @@ void DiscoLcdSetup(DiscoLcdOrientation orientation)
     WriteRegister(kLcdTearingEffect, parameter, 1);
 }
 
-void DiscoLcdGFX::fixCanvasBoundingBox(int16_t x0, int16_t y0, int16_t x1, int16_t y1)
+void DiscoLcdGFX::fixCanvasBoundingBox(int16_t x0,  // cppcheck-suppress unusedFunction
+                                       int16_t y0,
+                                       int16_t x1,
+                                       int16_t y1)
 {
     fixBoundingBox(x0, y0);
     fixBoundingBox(x1, y1);
@@ -491,25 +494,39 @@ void DiscoLcdGFX::clearCanvas(void)
     }
 }
 
-void DiscoLcdGFX::saveCanvas(void) { memcpy(savedCanvas_, canvas_, sizeof(canvas_)); }
+void DiscoLcdGFX::saveCanvas(void)  // cppcheck-suppress unusedFunction
+{
+    memcpy(savedCanvas_, canvas_, sizeof(canvas_));
+}
 
-void DiscoLcdGFX::restoreCanvas(void) { memcpy(canvas_, savedCanvas_, sizeof(canvas_)); }
+void DiscoLcdGFX::restoreCanvas(void)  // cppcheck-suppress unusedFunction
+{
+    memcpy(canvas_, savedCanvas_, sizeof(canvas_));
+}
 
-void DiscoLcdGFX::syncCanvas(void)
+void DiscoLcdGFX::syncCanvas(void)  // cppcheck-suppress unusedFunction
 {
     for (int y = 0; y < kLcdScreenHeight; y++) {
         DiscoLcdGetHLine(0, y, kLcdScreenWidth, canvas_[y]);
     }
 }
 
-uint16_t DiscoLcdId(void) { return ReadRegister(kLcdId); }
+uint16_t DiscoLcdId(void)  // cppcheck-suppress unusedFunction
+{
+    return ReadRegister(kLcdId);
+}
 
-void DiscoLcdGFX::drawPixel(int16_t x, int16_t y, uint16_t color)
+void DiscoLcdGFX::drawPixel(int16_t x,  // cppcheck-suppress unusedFunction
+                            int16_t y,
+                            uint16_t color)
 {
     canvas_[x][y] = color;
     DiscoLcdSetPixel(x, y, color);
 }
-void DiscoLcdGFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+void DiscoLcdGFX::drawFastHLine(int16_t x,  // cppcheck-suppress unusedFunction
+                                int16_t y,
+                                int16_t w,
+                                uint16_t color)
 {
     for (int16_t i = x; i < x + w; i++) {
         canvas_[y][i] = color;
@@ -517,7 +534,7 @@ void DiscoLcdGFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
     DiscoLcdDrawHLine(x, y, w, color);
 }
 
-void DiscoLcdGFX::startWrite(void)
+void DiscoLcdGFX::startWrite(void)  // cppcheck-suppress unusedFunction
 {
     // for (int y = 0; y < kLcdScreenHeight; y++) {
     //     DiscoLcdGetHLine(0, y, kLcdScreenWidth, canvas_[y]);
@@ -536,13 +553,20 @@ void DiscoLcdGFX::fixBoundingBox(int16_t x, int16_t y)
     if (y > maxy_) maxy_ = y;
 }
 
-void DiscoLcdGFX::writePixel(int16_t x, int16_t y, uint16_t color)
+void DiscoLcdGFX::writePixel(int16_t x,  // cppcheck-suppress unusedFunction
+                             int16_t y,
+                             uint16_t color)
 {
     fixBoundingBox(x, y);
     canvas_[y][x] = color;
 }
 
-void DiscoLcdGFX::writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+void DiscoLcdGFX::writeFillRect(  // cppcheck-suppress unusedFunction
+    int16_t x,
+    int16_t y,
+    int16_t w,
+    int16_t h,
+    uint16_t color)
 {
     fixBoundingBox(x, y);
     fixBoundingBox(x + w - 1, y + h - 1);
@@ -553,7 +577,10 @@ void DiscoLcdGFX::writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint
     }
 }
 
-void DiscoLcdGFX::writeFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+void DiscoLcdGFX::writeFastVLine(int16_t x,  // cppcheck-suppress unusedFunction
+                                 int16_t y,
+                                 int16_t h,
+                                 uint16_t color)
 {
     fixBoundingBox(x, y);
     fixBoundingBox(x, y + h - 1);
@@ -562,7 +589,10 @@ void DiscoLcdGFX::writeFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color
     }
 }
 
-void DiscoLcdGFX::writeFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+void DiscoLcdGFX::writeFastHLine(int16_t x,  // cppcheck-suppress unusedFunction
+                                 int16_t y,
+                                 int16_t w,
+                                 uint16_t color)
 {
     fixBoundingBox(x, y);
     fixBoundingBox(x + w - 1, y);
@@ -571,7 +601,7 @@ void DiscoLcdGFX::writeFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color
     }
 }
 
-void DiscoLcdGFX::endWrite(void)
+void DiscoLcdGFX::endWrite(void)  // cppcheck-suppress unusedFunction
 {
     for (int16_t y = miny_; y <= maxy_; y++) {
         DiscoLcdSetHLine(minx_, y, maxx_ - minx_ + 1, &canvas_[y][minx_]);

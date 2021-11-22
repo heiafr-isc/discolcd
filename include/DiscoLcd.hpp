@@ -63,29 +63,32 @@ void DiscoLcdDrawHLine(uint16_t xPos, uint16_t yPos, uint16_t len, uint16_t rgbC
 
 class DiscoLcdGFX : public AdafruitGFX {
    public:
-    DiscoLcdGFX(int16_t w, int16_t h) : AdafruitGFX(w, h){
+    DiscoLcdGFX(int16_t w, int16_t h) : AdafruitGFX(w, h), minx_{0}, miny_{0}, maxx_{0}, maxy_{0}
+    {
         clearCanvas();
-    };
-    void drawPixel(int16_t x, int16_t y, uint16_t color);
-    void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
-    
+    }
+    void drawPixel(int16_t x, int16_t y, uint16_t color) override;
+
+    void drawPixel(int16_t x, int16_t y, uint16_t color) override;
+    void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) override;
+
     void fixCanvasBoundingBox(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
     void clearCanvas(void);
     void saveCanvas(void);
     void restoreCanvas(void);
     void syncCanvas(void);
 
-    void startWrite(void);
-    void writePixel(int16_t x, int16_t y, uint16_t color);
-    void writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-    void writeFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-    void writeFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
-    void endWrite(void);
+    void startWrite(void) override;
+    void writePixel(int16_t x, int16_t y, uint16_t color) override;
+    void writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) override;
+    void writeFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) override;
+    void writeFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) override;
+    void endWrite(void) override;
 
    private:
     void fixBoundingBox(int16_t x, int16_t y);
-    uint16_t canvas_[kLcdScreenHeight][kLcdScreenWidth];
-    uint16_t savedCanvas_[kLcdScreenHeight][kLcdScreenWidth];
+    uint16_t canvas_[kLcdScreenHeight][kLcdScreenWidth]= {0};
+    uint16_t savedCanvas_[kLcdScreenHeight][kLcdScreenWidth] = {0};
 
     uint16_t minx_, miny_, maxx_, maxy_;
 };
