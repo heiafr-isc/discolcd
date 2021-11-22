@@ -1,10 +1,8 @@
-#include <Disco.h>
 #include <FontsGFX/FreeSans12pt7b.h>
 #include <FontsGFX/IBMPlexMonoBold60pt7b.h>
 #include <libopencm3/cm3/assert.h>
 
 #include <AdafruitGFX.hpp>
-#include <DiscoAssert.hpp>
 #include <DiscoLcd.hpp>
 #include "Pwm.hpp"
 
@@ -25,7 +23,6 @@ void Wait2Sec()
 
 void BasicTest()
 {
-    DiscoBoardSetup();
     DiscoLcdSetup();
     auto backLight = PWM(PWM::PF5);
     backLight.SetDutyCycle(10);

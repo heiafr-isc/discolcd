@@ -68,8 +68,6 @@ class DiscoLcdGFX : public AdafruitGFX {
         clearCanvas();
     }
     void drawPixel(int16_t x, int16_t y, uint16_t color) override;
-
-    void drawPixel(int16_t x, int16_t y, uint16_t color) override;
     void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) override;
 
     void fixCanvasBoundingBox(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
