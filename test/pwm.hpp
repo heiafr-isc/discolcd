@@ -13,29 +13,37 @@
 // limitations under the License.
 
 /****************************************************************************
- * @file unitest_transport.h
+ * @file pwm.hpp
  * @author Jacques Supcik <jacques.supcik@hefr.ch>
+ * @author Luca Haab <luca-haab@hefr.ch>
  *
- * @brief Disco Test transport for the "PlatformIO Unit Testing Engine"
+ * @brief PWM driver for the Disco board
  *
- * @date 2021-08-29
- * @version 0.1.2
+ * @date 2022-12-10
+ * @version 0.2.0
  ***************************************************************************/
 
-#ifndef UNITTEST_TRANSPORT_H_
-#define UNITTEST_TRANSPORT_H_
+#ifndef PWM_HPP_
+#define PWM_HPP_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "stm32f4xx_hal.h"
+#include <stdint.h>
 
-extern void unittest_uart_begin(void);
-extern void unittest_uart_putchar(char c);
-extern void unittest_uart_flush(void);
-extern void unittest_uart_end(void);
+class PWM {
+   public:
+    enum Pin { kPF3, kPF5, kPF10 };
+    
+    explicit PWM(Pin pin);
+    ~PWM();
+    
+    void SetDutyCycle(float duty_cycle);
+    HAL_StatusTypeDef Start();
+    HAL_StatusTypeDef Stop();
 
-#ifdef __cplusplus
-}
-#endif
+   private:
+    static TIM_HandleTypeDef htim5;
+    static HAL_StatusTypeDef InitPwm();
+    Pin pin_;
+};    
 
-#endif /* UNITTEST_TRANSPORT_H_ */
+#endif /* PWM_HPP_ */
